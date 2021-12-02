@@ -11,24 +11,29 @@ const tasks = [];
 app.use(express.static(path.join(__dirname, '/client')));
 
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '/client/src/index.js'));
+  res.sendFile(path.join(__dirname, '/client/src/App.js'));
 });
 
 const server = app.listen(process.env.PORT || 8000, () => {
   console.log('Server is running...');
 });
 
-const io = socket(server);
+const io = socket(server, {
+  cors: { origin: "http://localhost:3000" }
+});
 
 io.on('connection', (socket) => {
-  socket.id.emit('updateData', tasks);
+  socket.emit('updateData', tasks);
   socket.on('addTask', (task) => {
     tasks.push(task);
     socket.broadcast.emit('addTask', task);
   });
-  socket.on('removeTask', (deletedTaskIndex) => {
-    tasks.splice(deletedTaskIndex, 1);
-    socket.broadcast.emit('removeTask', deletedTaskIndex);
+  socket.on('removeTask', (deletedTaskId) => {
+    tasks.forEach(task => {
+      const index = tasks.indexOf(task);
+      task.id === deletedTaskId && tasks.splice(index, 1);
+    })
+    socket.broadcast.emit('removeTask', deletedTaskId);
   });
 });
 
