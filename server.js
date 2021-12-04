@@ -26,7 +26,7 @@ io.on('connection', (socket) => {
   socket.emit('updateData', tasks);
   socket.on('addTask', (task) => {
     tasks.push(task);
-    socket.broadcast.emit('addTask', task);
+    socket.broadcast.emit('updateData', tasks);
   });
   socket.on('removeTask', (deletedTaskId) => {
     tasks.forEach(task => {

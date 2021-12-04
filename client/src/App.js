@@ -18,8 +18,8 @@ class App extends React.Component {
   
 
   componentDidMount(){
-    this.socket.on('removeTask', (task) => {
-      this.removeTask(task, 'server');
+    this.socket.on('removeTask', (taskId) => {
+      this.removeTask(taskId, 'server');
     })
     this.socket.on('addTask', (task) => {
       this.addTask(task);
@@ -29,33 +29,30 @@ class App extends React.Component {
     })
   }
   removeTask(taskId, server){
-    const actualTasks = this.state.tasks;
-    actualTasks.forEach(task => {
-      const index = actualTasks.indexOf(task);
-      task.id === taskId && actualTasks.splice(index, 1);
+    const filteredTasks = this.state.tasks;
+    filteredTasks.filter(task => {
+      const index = filteredTasks.indexOf(task);
+      task.id === taskId && filteredTasks.splice(index, 1);
     })
     this.setState({
-      tasks: actualTasks
+      tasks: filteredTasks
     })
     if(server === 'self') this.socket.emit('removeTask', taskId);
     this.inputClear()
   }
   addTask(taskName){
-    const actualTasks = this.state.tasks;
     const task = {id: uuidv4(), name: taskName}
-    actualTasks.push(task);
+    const actualTasks = [...this.state.tasks, task];
     this.setState({
       tasks: actualTasks
     });
-    console.log(actualTasks);
-
+    this.socket.emit('addTask', task);
     this.inputClear()
   }
   submitForm(e){
     e.preventDefault();
 
     this.addTask(this.state.taskName);
-    this.socket.emit('addTask', task);
     this.inputClear()
   }
   inputClear(){
