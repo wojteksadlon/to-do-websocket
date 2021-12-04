@@ -51,7 +51,7 @@ class App extends React.Component {
 
     this.inputClear()
   }
-  submitForm(e, task){
+  submitForm(e){
     e.preventDefault();
 
     this.addTask(this.state.taskName);
@@ -96,7 +96,7 @@ class App extends React.Component {
               value={this.state.taskName}
               onChange={(e) => this.setState({taskName: e.target.value})}
             />
-            <button className="btn" type="submit" onClick={(e, task) => this.submitForm(e, task)}>
+            <button className="btn" type="submit" onClick={(e) => this.submitForm(e)}>
               Add
             </button>
           </form>
